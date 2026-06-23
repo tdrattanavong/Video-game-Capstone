@@ -10,6 +10,7 @@ import org.yearup.models.Product;
 import org.yearup.service.CategoryService;
 import org.yearup.service.ProductService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // add the annotations to make this a REST controller
@@ -65,6 +66,8 @@ public class CategoriesController
     public List<Product> getProductsById(@PathVariable int categoryId)
     {
         // get a list of product by categoryId
+        var category = categoryService.getById(categoryId);
+        if(category == null) return new ArrayList<>();
         return productService.listByCategoryId(categoryId);
     }
 
