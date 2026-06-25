@@ -26,28 +26,20 @@ public class ShoppingCartService
 
     public ShoppingCart getByUserId(int userId)
     {
+        // load the user's cart rows, look up each product, and build the ShoppingCart
+        List<CartItem> items = shoppingCartRepository.findByUserId(userId);
         ShoppingCart cart = new ShoppingCart();
 
-        // load the user's cart rows, look up each product, and build the ShoppingCart
-        List<CartItem> rows = shoppingCartRepository.findByUserId(userId);
-        if (rows == null || rows.isEmpty())
-        {
-            return cart; // empty cart
-        }
         // for each row, look up the product and create a ShoppingCartItem
-        for (CartItem row : rows) {
-            Product product = productService.getById(row.getProductId());
-            if (product == null)
-            {
-                // product was deleted/doesn't exist — skip this row (or optionally remove it)
-                continue;
-            }
-            ShoppingCartItem item = new ShoppingCartItem();
+        for (CartItem item : items) {
+            Product product = productService.getById(item.getProductId());
+//
+            ShoppingCartItem shoppingCartItem = new ShoppingCartItem();
 
-            item.setProduct(product);
-            item.setQuantity(row.getQuantity());
+            shoppingCartItem.setProduct(product);
+            shoppingCartItem.setQuantity(item.getQuantity());
 
-            cart.add(item);
+            cart.add(shoppingCartItem);
         }
 
         return cart;
@@ -99,10 +91,10 @@ public class ShoppingCartService
     }
 
     @Transactional
-    public ShoppingCart clearCart(int userId)
+    public boolean clearCart(int userId)
     {
         shoppingCartRepository.deleteByUserId(userId);
 
-        return getByUserId(userId);
+        return true;
     }
 }
