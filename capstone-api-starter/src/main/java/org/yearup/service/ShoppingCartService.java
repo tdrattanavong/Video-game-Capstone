@@ -1,8 +1,15 @@
 package org.yearup.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import org.yearup.models.CartItem;
+import org.yearup.models.Product;
 import org.yearup.models.ShoppingCart;
+import org.yearup.models.ShoppingCartItem;
 import org.yearup.repository.ShoppingCartRepository;
+
+import java.util.List;
 
 @Service
 public class ShoppingCartService
@@ -19,9 +26,83 @@ public class ShoppingCartService
 
     public ShoppingCart getByUserId(int userId)
     {
+        ShoppingCart cart = new ShoppingCart();
+
         // load the user's cart rows, look up each product, and build the ShoppingCart
-        return null;
+        List<CartItem> rows = shoppingCartRepository.findByUserId(userId);
+        if (rows == null || rows.isEmpty())
+        {
+            return cart; // empty cart
+        }
+        // for each row, look up the product and create a ShoppingCartItem
+        for (CartItem row : rows) {
+            Product product = productService.getById(row.getProductId());
+            if (product == null)
+            {
+                // product was deleted/doesn't exist — skip this row (or optionally remove it)
+                continue;
+            }
+            ShoppingCartItem item = new ShoppingCartItem();
+
+            item.setProduct(product);
+            item.setQuantity(row.getQuantity());
+
+            cart.add(item);
+        }
+
+        return cart;
     }
 
     // add additional methods here
+
+    public ShoppingCart addProductToCart(int userId, int productID)
+    {
+        // checks to see if item is currently in the cart, if it is, it will increment the quantity by 1,
+        // if not, it will add a new item to the cart with a quantity of 1
+        CartItem item = shoppingCartRepository.findByUserIdAndProductId(userId, productID);
+
+        if (item == null)
+        {
+            item = new CartItem();
+            item.setUserId(userId);
+            item.setProductId(productID);
+            item.setQuantity(1);
+        }
+        else
+        {
+            int currentQuantity = item.getQuantity();
+            item.setQuantity(currentQuantity + 1);
+        }
+
+        shoppingCartRepository.save(item);
+
+        return getByUserId(userId);
+    }
+
+    public ShoppingCart updateProductInCart(int userId, int productID, int quantity)
+    {
+        CartItem item = shoppingCartRepository.findByUserIdAndProductId(userId, productID);
+
+        if (item == null)
+        {
+            throw new ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "Product not found in cart");
+        }
+        if (quantity < 1)
+        {
+            throw new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Quantity must be at least 1");
+        }
+
+        item.setQuantity(quantity);
+        shoppingCartRepository.save(item);
+
+        return getByUserId(userId);
+    }
+
+    @Transactional
+    public ShoppingCart clearCart(int userId)
+    {
+        shoppingCartRepository.deleteByUserId(userId);
+
+        return getByUserId(userId);
+    }
 }
