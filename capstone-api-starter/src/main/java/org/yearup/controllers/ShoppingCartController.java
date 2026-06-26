@@ -90,6 +90,12 @@ public class ShoppingCartController
         User user = userService.getByUserName(userName);
         int userId = user.getId();
 
+        // here all my values were correct. but for some reason the userid was null
+        // from the ShoppingCartController everytime.
+        // after using the debuggung tool, I found out the reason why userId was null
+        // was because the username it was receiving was "testuser" and the "testuser" I found
+        // did not exist in the database. After going in insomnia and changing the Auth to the "user"
+        // it solved the problem
         shoppingCartService.clearCart(userId);
 
         ShoppingCart cart = shoppingCartService.getByUserId(userId);
