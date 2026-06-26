@@ -93,6 +93,12 @@ public class ShoppingCartService
     @Transactional
     public boolean clearCart(int userId)
     {
+        // here all my values were correct. but for some reason the userid was null
+        // from the ShoppingCartController everytime.
+        // after using the debuggung tool, i found out the reason why userId was null
+        // was because the username it was receiving was "testuser" and the "testuser" i found
+        // did not exist in the database. After going in insomnia and changin the Auth to the "user"
+        // it solved the problem
         shoppingCartRepository.deleteByUserId(userId);
 
         return true;
