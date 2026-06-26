@@ -23,6 +23,7 @@ public class ProfileService {
 
     public Profile update(int userId, Profile profile)
     {
+
         Profile existing = profileRepository.findById(userId).orElseThrow();
         existing.setFirstName(profile.getFirstName());
         existing.setLastName(profile.getLastName());
@@ -33,5 +34,11 @@ public class ProfileService {
         existing.setState(profile.getState());
         existing.setZip(profile.getZip());
         return profileRepository.save(existing);
+
+
+
+
+
+
     }
 }

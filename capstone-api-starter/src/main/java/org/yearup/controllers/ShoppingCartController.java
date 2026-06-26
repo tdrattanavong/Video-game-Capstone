@@ -42,9 +42,10 @@ public class ShoppingCartController
         int userId = user.getId();
 
         // use the shoppingCartService to get all items in the cart and return the cart
-        var cart = shoppingCartService.getByUserId(userId);
+        var shoppingCart = shoppingCartService.getByUserId(userId);
 
-        return cart;
+
+        return shoppingCart;
     }
 
     // add a POST method to add a product to the cart - the url should be

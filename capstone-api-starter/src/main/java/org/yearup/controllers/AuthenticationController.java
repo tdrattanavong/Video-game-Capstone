@@ -1,7 +1,6 @@
 package org.yearup.controllers;
 
 import jakarta.validation.Valid;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +12,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
 import org.yearup.models.Profile;
 import org.yearup.service.ProfileService;
 import org.yearup.service.UserService;
